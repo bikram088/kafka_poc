@@ -25,8 +25,6 @@ public class ScheduledTaskService {
     private final JsonPlaceholderClient jsonPlaceholderClient;
 
     private static final String VALID_EVENT_TOPICS = "my-kafka-topic";
-    //private static final String FAILED_EVENTS_TOPICS = "my-kafka-topic";
-
 
     @Autowired
     public ScheduledTaskService(KafkaProducerService kafkaProducerService, JsonPlaceholderClient jsonPlaceholderClient) {
@@ -39,20 +37,23 @@ public class ScheduledTaskService {
         List<Post> posts = new ArrayList<>();
         try {
             posts = jsonPlaceholderClient.getPosts().getBody();
-        }
-        catch(ApiException ex){
-            logger.error("Exception Encountered When calling the API with error {}.", ex.getMessage());
+        } catch (ApiException ex) {
+            logger.error("Exception encountered when calling the API with error {}.", ex.getMessage());
         }
 
-        for (Post post : posts) {
-            // Validate the data
-            if (post.getTitle() != null && !post.getTitle().isEmpty()) {
-                // Send the valid post data to Kafka
-                kafkaProducerService.sendMessage(VALID_EVENT_TOPICS, post);
-                logger.info("Produced message to Kafka: {}.", post);
-            } else {
-                logger.info("Invalid Data: {}.", post);
-            }
+        posts.forEach(this::processPost);
+    }
+
+    private void processPost(Post post) {
+        if (isValidPost(post)) {
+            kafkaProducerService.sendMessage(VALID_EVENT_TOPICS, post);
+            logger.info("Produced message to Kafka: {}.", post);
+        } else {
+            logger.info("Invalid Data: {}.", post);
         }
+    }
+
+    private boolean isValidPost(Post post) {
+        return post.getTitle() != null && !post.getTitle().isEmpty();
     }
 }
