@@ -6,12 +6,8 @@ import com.kafka.connector.model.Post;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +22,14 @@ public class ScheduledTaskService {
 
     private static final String VALID_EVENT_TOPICS = "my-kafka-topic";
 
+    String isTest = "${test}";
     @Autowired
     public ScheduledTaskService(KafkaProducerService kafkaProducerService, JsonPlaceholderClient jsonPlaceholderClient) {
         this.kafkaProducerService = kafkaProducerService;
         this.jsonPlaceholderClient = jsonPlaceholderClient;
     }
 
-    @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "${cron.schedule}")
     public void fetchDataAndSendToKafka() {
         List<Post> posts = new ArrayList<>();
         try {
@@ -41,7 +38,9 @@ public class ScheduledTaskService {
             logger.error("Exception encountered when calling the API with error {}.", ex.getMessage());
         }
 
-        posts.forEach(this::processPost);
+            //For Testing purpose please comment out the below line
+            posts.forEach(this::processPost);
+            processPost(posts.get(0));
     }
 
     private void processPost(Post post) {
