@@ -22,7 +22,6 @@ public class ScheduledTaskService {
 
     private static final String VALID_EVENT_TOPICS = "my-kafka-topic";
 
-    String isTest = "${test}";
     @Autowired
     public ScheduledTaskService(KafkaProducerService kafkaProducerService, JsonPlaceholderClient jsonPlaceholderClient) {
         this.kafkaProducerService = kafkaProducerService;
@@ -38,7 +37,7 @@ public class ScheduledTaskService {
             logger.error("Exception encountered when calling the API with error {}.", ex.getMessage());
         }
 
-            //For Testing purpose please comment out the below line
+            //For Testing purpose please comment out the below line: posts.forEach(this::processPost);
             posts.forEach(this::processPost);
             processPost(posts.get(0));
     }
