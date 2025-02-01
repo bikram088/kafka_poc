@@ -36,10 +36,7 @@ public class ScheduledTaskService {
         } catch (ApiException ex) {
             logger.error("Exception encountered when calling the API with error {}.", ex.getMessage());
         }
-
-            //For Testing purpose please comment out the below line: posts.forEach(this::processPost);
-            posts.forEach(this::processPost);
-            processPost(posts.get(0));
+        posts.forEach(this::processPost);
     }
 
     private void processPost(Post post) {

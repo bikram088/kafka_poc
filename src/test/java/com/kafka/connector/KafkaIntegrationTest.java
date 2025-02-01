@@ -2,6 +2,7 @@ package com.kafka.connector;
 
 import com.kafka.connector.service.ScheduledTaskService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Collections;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -48,11 +50,30 @@ public class KafkaIntegrationTest {
 
         // Consume message from Kafka topic
         consumer.subscribe(Collections.singletonList(topic));
-        ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, topic);
 
-        // Validate the consumed message
-        assertTrue(record.value().contains("id"));
-        assertTrue(record.value().contains("title"));
-        assertTrue(record.value().contains("body"));
+        ConsumerRecords<String, String> records = KafkaTestUtils.getRecords(consumer);
+        int totalRecords = records.count();
+
+        assertEquals(100, totalRecords);
+        for(ConsumerRecord<String, String> record : records){
+            assertTrue(record.value().contains("id"));
+            assertTrue(record.value().contains("title"));
+            assertTrue(record.value().contains("body"));
+        }
     }
+
+
+    @Test
+    public void testProduceConsumeEmptyTopic() {
+        String topic = "my-kafka-topic";
+
+        // Consume message from Kafka topic
+        consumer.subscribe(Collections.singletonList(topic));
+
+        ConsumerRecords<String, String> records = KafkaTestUtils.getRecords(consumer);
+        int totalRecords = records.count();
+
+        assertEquals(0, totalRecords);
+    }
+
 }
