@@ -1,4 +1,5 @@
 package com.kafka.connector.service;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kafka.connector.model.Post;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,11 @@ public class KafkaProducerService {
     }
 
     public void sendMessage(String topic, Post post) {
-        // Sending post data as a JSON string to Kafka topic
-        kafkaTemplate.send(topic, post.toString());
+        try {
+            String jsonPost = new ObjectMapper().writeValueAsString(post);
+            kafkaTemplate.send(topic, jsonPost);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize Post object", e);
+        }
     }
 }
