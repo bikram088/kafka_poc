@@ -1,0 +1,16 @@
+Source change (FileChunkReaderAdapter)
+Path relativePath =
+    directoryScanConfig.getDirectoryPath()
+        .relativize(file.getPath());
+
+headers.put("file.relative.path", relativePath.toString());
+
+
+-------------------------------------------------
+
+String relativePath = headers.get("file.relative.path");
+
+Path outputFile =
+    sinkRoot.resolve(relativePath);
+
+Files.createDirectories(outputFile.getParent());
